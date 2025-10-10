@@ -1,0 +1,26 @@
+# Ignore build outputs
+bin/
+obj/
+
+# Rider and Visual Studio
+.idea/
+.vs/
+.vscode/
+*.suo
+
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# MacOS files
+.DS_Store
+
+# Logs
+*.log
+
+# NuGet packages
+*.nupkg
+
+# dotnet watch file
+.dotnet/
