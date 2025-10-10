@@ -10,10 +10,12 @@ namespace degiskenler
             /*
              Çoklu açıklama satırı
             */
-            // console'a ekrana yazdırma
+            // console'a yazdırma
+            Console.WriteLine("Console'a yazdırma örneği:");
             Console.WriteLine("Hello World!");
 
             // değişken tanımlama ve console'a yazdırma
+            Console.WriteLine("Değişken tanımlama ve console'a yazdırma örnekleri:");
             int sayı = 12;
             char karakter = 'A';
 
@@ -21,6 +23,7 @@ namespace degiskenler
             Console.WriteLine(karakter);
 
             //if fonksiyonları
+            Console.WriteLine("If Örneği:");
             if (sayı > 10)
             {
                 Console.WriteLine("Sayı 10'dan büyük.");
@@ -30,7 +33,12 @@ namespace degiskenler
                 Console.WriteLine("Sayı 10'dan küçük veya eşittir.");
             }
 
-            Console.WriteLine("tuğçe mal");
+            // döngü örneği
+            Console.WriteLine("Döngü Örnekleri:");
+            for (int i = 0; i < 5; i++)
+            {
+                Console.WriteLine("Döngü sayısı: " + i);
+            }
         }
     }
 }
