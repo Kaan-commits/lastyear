@@ -10,12 +10,10 @@ namespace degiskenler
             /*
              Çoklu açıklama satırı
             */
-            // console'a yazdırma
-            Console.WriteLine("Console'a yazdırma örneği:");
-            Console.WriteLine("Hello World!");
+            consoleYazdir();
 
             // değişken tanımlama ve console'a yazdırma
-            Console.WriteLine("Değişken tanımlama ve console'a yazdırma örnekleri:");
+            Console.WriteLine("\nDeğişken tanımlama ve console'a yazdırma örnekleri:\n");
             int sayı = 12;
             char karakter = 'A';
 
@@ -23,7 +21,7 @@ namespace degiskenler
             Console.WriteLine(karakter);
 
             //if fonksiyonları
-            Console.WriteLine("If Örneği:");
+            Console.WriteLine("\nIf Örneği:\n");
             if (sayı > 10)
             {
                 Console.WriteLine("Sayı 10'dan büyük.");
@@ -34,11 +32,41 @@ namespace degiskenler
             }
 
             // döngü örneği
-            Console.WriteLine("Döngü Örnekleri:");
+            Console.WriteLine("\nDöngü Örnekleri:\n");
             for (int i = 0; i < 5; i++)
             {
                 Console.WriteLine("Döngü sayısı: " + i);
             }
+
+            /* Sonsuz Döngü Örneği:
+            for (;;)
+                Console.WriteLine("Bu bir sonsuz döngüdür.");
+            */
+
+            while (sayı > 0)
+            {
+                Console.WriteLine("Sayı: " + sayı);
+                sayı--;
+            }
+
+            //diziler
+            Console.WriteLine("\nDizi Örneği:");
+            int[] sayilar = { 1, 2, 3, 4, 5 };
+            int[] numbers = new int[5]; // boş dizi tanımlama
+            foreach (int s in sayilar)
+            {
+                Console.WriteLine("Dizi elemanı: " + s);
+            }
+            foreach (int s in numbers)
+            {
+                Console.WriteLine("Boş dizinin elemanı: " + s); // tüm elemanlar 0'dır
+            }
+        }
+
+        static void consoleYazdir()
+        {
+            Console.WriteLine("\nConsole'a yazdırma örneği:\n");
+            Console.WriteLine("Hello World!");
         }
     }
 }
