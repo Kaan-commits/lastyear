@@ -19,6 +19,16 @@ namespace degiskenler
 
             Console.WriteLine(sayı);
             Console.WriteLine(karakter);
+
+            //if fonksiyonları
+            if (sayı > 10)
+            {
+                Console.WriteLine("Sayı 10'dan büyüktür.");
+            }
+            else
+            {
+                Console.WriteLine("Sayı 10'dan küçük veya eşittir.");
+            }
         }
     }
 }
