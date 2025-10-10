@@ -61,12 +61,20 @@ namespace degiskenler
             {
                 Console.WriteLine("Boş dizinin elemanı: " + s); // tüm elemanlar 0'dır
             }
+
+            Console.WriteLine("Faktöriyel: " + Faktoriyel(3));
         }
 
         static void consoleYazdir()
         {
             Console.WriteLine("\nConsole'a yazdırma örneği:\n");
             Console.WriteLine("Hello World!");
+        }
+        
+        static int Faktoriyel(int n)
+        {
+            if (n <= 1) return 1;
+            return n * Faktoriyel(n - 1);
         }
     }
 }
