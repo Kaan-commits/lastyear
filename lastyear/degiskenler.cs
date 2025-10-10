@@ -23,12 +23,14 @@ namespace degiskenler
             //if fonksiyonları
             if (sayı > 10)
             {
-                Console.WriteLine("Sayı 10'dan büyüktür.");
+                Console.WriteLine("Sayı 10'dan büyük.");
             }
             else
             {
                 Console.WriteLine("Sayı 10'dan küçük veya eşittir.");
             }
+
+            Console.WriteLine("tuğçe mal");
         }
     }
 }
