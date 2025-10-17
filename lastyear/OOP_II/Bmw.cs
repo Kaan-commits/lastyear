@@ -6,15 +6,11 @@ using System.Threading.Tasks;
 
 namespace OOP_II
 {
-    internal class Araba
+    internal class Bmw : Araba
     {
-        protected int hiddenData;
-        public string Plaka { get; set; }
-        public string Model { get; set; }
-
         public void Sur()
         {
-            Console.WriteLine("Araba sür...");
+            Console.WriteLine("Bmw sür...");
         }
     }
 }

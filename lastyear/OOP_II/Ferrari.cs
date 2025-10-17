@@ -13,5 +13,10 @@ namespace OOP_II
            protected erişim belirleyicisi;
            dışarıya kapalı kendisinden türeyen sınıflara açık... 
         }*/
+
+        public void Sur()
+        {
+            Console.WriteLine("Ferrari sür...");
+        }
     }
 }
