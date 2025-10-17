@@ -36,7 +36,7 @@ namespace OOP_I
         //bir sınıfta bir tane olabilir
         //performans açısından kullanma
         //IDisposable arayüzü kullan
-        ~Urun()
+        //~Urun()
 
     }
 }
