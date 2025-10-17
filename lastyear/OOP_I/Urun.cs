@@ -24,12 +24,19 @@ namespace OOP_I
 
         public Urun(int id)
         {
-            
+
         }
-        
+
         public Urun()
         {
-            
+
         }
+        
+        //Yıkıcı metod
+        //bir sınıfta bir tane olabilir
+        //performans açısından kullanma
+        //IDisposable arayüzü kullan
+        ~Urun()
+
     }
 }
