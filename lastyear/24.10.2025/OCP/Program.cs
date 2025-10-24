@@ -10,8 +10,7 @@ namespace lastyear.OCP
         {
             Console.WriteLine("OCP - Open/Closed Principle");
 
-        //soru: text ve xml dosyalardan veri okuyan sınıfları yaz...
-
+            //soru: text ve xml dosyalardan veri okuyan sınıfları yaz...
 
             TextDosya text = new TextDosya();
             XmlDosya xml = new XmlDosya();
