@@ -168,5 +168,4 @@ pip install matplotlib
 
 ---
 
-**Hazırlayan**: Ödev Projesi  
-**Tarih**: 2025
+**Hazırlayan**: Kaan Kara

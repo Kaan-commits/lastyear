@@ -1,44 +1,39 @@
-#!/usr/bin/env python3
-"""
-8 Vezir Problemi - Grafik Görselleştirme (Matplotlib)
-Genotipi görsel satranç tahtası olarak gösterir
-"""
-
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
 
 
 def display_board_graphical(genotype, title="8 Vezir Tahtası"):
-    """
-    Genotipi grafik olarak görselleştirir (matplotlib).
-    
-    Args:
-        genotype: 1'den 8'e kadar sayılardan oluşan liste
-        title: Grafik başlığı
-    """
-    fig, ax = plt.subplots(figsize=(8, 8))
+
+    fig, ax = plt.subplots(figsize=(8, 8), facecolor='white')
     
     # Satranç tahtası oluştur
     for row in range(8):
         for col in range(8):
-            # Satranç tahtası renk deseni (açık/koyu kareler)
-            color = '#F0D9B5' if (row + col) % 2 == 0 else '#B58863'
+            # Siyah-beyaz desen
+            color = 'white' if (row + col) % 2 == 0 else 'black'
+            
             square = patches.Rectangle((col, 7-row), 1, 1, 
-                                       linewidth=1, 
-                                       edgecolor='black', 
-                                       facecolor=color)
+                                      linewidth=0.5, 
+                                      edgecolor='gray', 
+                                      facecolor=color)
             ax.add_patch(square)
     
     # Vezirleri yerleştir
     for col_index, row_value in enumerate(genotype):
         row_index = row_value - 1
+        x = col_index + 0.5
+        y = 7 - row_index + 0.5
         
-        # Vezir simgesi (♛) veya basit daire + Q
-        # ♛ karakteri her sistemde görünmeyebilir, bu yüzden hem simge hem de Q kullanıyoruz
-        ax.text(col_index + 0.5, 7 - row_index + 0.5, '♛', 
-                fontsize=40, ha='center', va='center', 
-                color='red', weight='bold')
+        # Vezir rengini kare rengine göre ayarla (kontrast için)
+        is_white_square = (row_index + col_index) % 2 == 0
+        queen_color = 'darkred' if is_white_square else 'gold'
+        
+        # Vezir simgesi - basit ve temiz
+        ax.text(x, y, '♛', 
+               fontsize=45, ha='center', va='center', 
+               color=queen_color, weight='bold',
+               zorder=3)
     
     # Eksen ayarları
     ax.set_xlim(0, 8)
@@ -46,17 +41,24 @@ def display_board_graphical(genotype, title="8 Vezir Tahtası"):
     ax.set_aspect('equal')
     ax.axis('off')
     
+    # Koordinat etiketleri (minimal)
     # Sütun numaraları (1-8)
     for i in range(8):
-        ax.text(i + 0.5, -0.3, str(i+1), 
-                ha='center', va='top', fontsize=12, weight='bold')
+        ax.text(i + 0.5, -0.2, str(i+1), 
+                ha='center', va='top', 
+                fontsize=11, weight='bold', 
+                color='black')
     
     # Satır numaraları (1-8)
     for i in range(8):
-        ax.text(-0.3, 7 - i + 0.5, str(i+1), 
-                ha='right', va='center', fontsize=12, weight='bold')
+        ax.text(-0.2, 7 - i + 0.5, str(i+1), 
+                ha='right', va='center', 
+                fontsize=11, weight='bold',
+                color='black')
     
-    plt.title(title, fontsize=16, weight='bold', pad=20)
+    # Başlık
+    plt.title(title, fontsize=14, weight='bold', pad=15, color='black')
+    
     plt.tight_layout()
     
     return fig
@@ -83,7 +85,7 @@ if __name__ == "__main__":
     genotype = [4, 2, 7, 3, 6, 8, 5, 1]
     
     conflicts = count_conflicts(genotype)
-    title = f"8 Vezir Problemi\nGenotip: {genotype}\nÇatışmalar: {conflicts}"
+    title = f"8 Queen Problem\nGenotype: {genotype}\nConflicts: {conflicts}"
     
     # Grafik görselleştirme
     fig = display_board_graphical(genotype, title)
@@ -93,7 +95,7 @@ if __name__ == "__main__":
     plt.savefig(output_file, dpi=150, bbox_inches='tight')
     print(f"✓ Grafik kaydedildi: {output_file}")
     
-    # Ekranda göster (isteğe bağlı)
+    # Ekranda göster
     plt.show()
     
     print(f"\nGenotip: {genotype}")
