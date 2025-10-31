@@ -39,7 +39,12 @@ namespace lastyear.ConsoleApp1
         temsilci -= Test2;
         temsilci();
 
-        buton buton = new buton();
-        buton.
+        Buton buton = new Buton();
+        buton.ButonTikla += buton_ButonTikla;
+
+        void buton_ButonTikla()
+        {
+            System.Console.WriteLine("Butona tıklandı...");
+        }
     }
 }

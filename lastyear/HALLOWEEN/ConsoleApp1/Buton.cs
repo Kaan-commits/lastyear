@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
-    internal class buton
+    internal class Buton
     {
         public event Temsilci ButonTikla;
+
+        public void Tetikle()
+        {
+            if(ButonTikla != null)
+            {
+                ButonTikla();
+            }
+        }
     }
 }
