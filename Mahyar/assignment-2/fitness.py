@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Kaan Kara - 220404046
 import random
 
 
@@ -6,49 +7,37 @@ def generate_population(size=100):
     population = []
     
     for _ in range(size):
-        # 1'den 8'e kadar sayıları içeren temel genotip
+
         genotype = [1, 2, 3, 4, 5, 6, 7, 8]
-        
-        # Rastgele karıştır (permütasyon oluştur)
+
         random.shuffle(genotype)
-        
-        # Popülasyona ekle
+
         population.append(genotype)
     
     return population
 
-
 def calculate_fitness(genotype):
     n = len(genotype)
-    
-    # Toplam vezir çifti sayısı: C(n,2) = n*(n-1)/2
+
     total_pairs = n * (n - 1) // 2
-    
-    # Çapraz çatışmaları say
+
     attacking_pairs = 0
     
     for i in range(n):
         for j in range(i + 1, n):
-            # İki vezirin konumu:
-            # Vezir 1: sütun=i, satır=genotype[i]-1
-            # Vezir 2: sütun=j, satır=genotype[j]-1
             
             col1, row1 = i, genotype[i] - 1
             col2, row2 = j, genotype[j] - 1
             
-            # Çapraz çatışma kontrolü:
-            # abs(col1 - col2) == abs(row1 - row2)
             col_diff = abs(col1 - col2)
             row_diff = abs(row1 - row2)
             
             if col_diff == row_diff:
                 attacking_pairs += 1
-    
-    # Fitness = Saldırmayan çift sayısı
+
     fitness = total_pairs - attacking_pairs
     
     return fitness
-
 
 def calculate_fitness_verbose(genotype):
     n = len(genotype)
@@ -94,43 +83,37 @@ def calculate_fitness_verbose(genotype):
     
     return fitness
 
-
-# Test ve örnek kullanım
 if __name__ == "__main__":
     print("=" * 70)
     print("8 VEZİR PROBLEMİ - FİTNESS FONKSİYONU")
     print("=" * 70)
-    
-    # Test 1: Mükemmel çözüm
+
     print("\n" + "=" * 70)
     print("TEST 1: Bilinen Mükemmel Çözüm")
     print("=" * 70)
     perfect_solution = [4, 2, 7, 3, 6, 8, 5, 1]
     fitness1 = calculate_fitness_verbose(perfect_solution)
     
-    # Test 2: En kötü çözüm (düz çapraz)
     print("\n" + "=" * 70)
     print("TEST 2: En Kötü Çözüm (Düz Çapraz)")
     print("=" * 70)
     worst_solution = [1, 2, 3, 4, 5, 6, 7, 8]
     fitness2 = calculate_fitness_verbose(worst_solution)
     
-    # Test 3: Orta seviye çözüm
     print("\n" + "=" * 70)
     print("TEST 3: Orta Seviye Çözüm")
     print("=" * 70)
     medium_solution = [3, 5, 7, 2, 4, 8, 1, 6]
     fitness3 = calculate_fitness_verbose(medium_solution)
     
-    # Hızlı test (verbose olmadan)
     print("\n" + "=" * 70)
     print("HIZLI TEST SONUÇLARI")
     print("=" * 70)
     test_cases = [
-        [4, 2, 7, 3, 6, 8, 5, 1],  # Mükemmel
-        [1, 2, 3, 4, 5, 6, 7, 8],  # En kötü
-        [8, 7, 6, 5, 4, 3, 2, 1],  # Ters çapraz
-        [3, 5, 7, 2, 4, 8, 1, 6],  # Rastgele
+        [4, 2, 7, 3, 6, 8, 5, 1],
+        [1, 2, 3, 4, 5, 6, 7, 8],
+        [8, 7, 6, 5, 4, 3, 2, 1],
+        [3, 5, 7, 2, 4, 8, 1, 6],
     ]
     
     for i, genotype in enumerate(test_cases, 1):
@@ -139,26 +122,22 @@ if __name__ == "__main__":
         print(f"         Fitness = {fitness}/28 ({(fitness/28)*100:.1f}%)")
         print()
     
-    # Test 4: Popülasyon oluşturma
     print("\n" + "=" * 70)
     print("TEST 4: POPÜLASYON OLUŞTURMA")
     print("=" * 70)
-    
-    # Küçük popülasyon oluştur
+
     print("\n1. Küçük popülasyon (size=5):")
     small_pop = generate_population(size=5)
     for i, individual in enumerate(small_pop, 1):
         fitness = calculate_fitness(individual)
         print(f"   Birey {i}: {individual} → Fitness: {fitness}/28")
-    
-    # Normal boyutta popülasyon
+
     print("\n2. Normal popülasyon (size=100):")
     normal_pop = generate_population(size=100)
     print(f"   Popülasyon boyutu: {len(normal_pop)}")
     print(f"   İlk birey: {normal_pop[0]}")
     print(f"   Son birey: {normal_pop[-1]}")
-    
-    # Popülasyon istatistikleri
+
     print("\n3. Popülasyon İstatistikleri:")
     fitness_scores = [calculate_fitness(ind) for ind in normal_pop]
     
@@ -179,8 +158,7 @@ if __name__ == "__main__":
         print("   🎉 Popülasyonda mükemmel çözüm bulundu!")
     else:
         print(f"   ℹ️  Mükemmel çözüme {28 - max_fitness} çatışma kaldı.")
-    
-    # Doğrulama: Her genotip geçerli permütasyon mu?
+
     print("\n4. Doğrulama:")
     all_valid = all(sorted(ind) == [1, 2, 3, 4, 5, 6, 7, 8] for ind in normal_pop)
     print(f"   Tüm bireyler geçerli permütasyon mu? {'✓ Evet' if all_valid else '✗ Hayır'}")
