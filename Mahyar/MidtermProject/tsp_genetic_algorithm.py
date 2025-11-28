@@ -1,8 +1,10 @@
+# Kaan Kara - 220404046
+
 import random
 import math
+import os
 from typing import List, Tuple, Dict
 import copy
-
 
 class TSPData:
     
@@ -42,23 +44,17 @@ class TSPData:
         
         print(f"TSP Dosyası Yüklendi: {self.name}")
         print(f"Şehir Sayısı: {self.dimension}")
-        print(f"Mesafe Tipi: {self.edge_weight_type}")
     
     def calculate_distance(self, city1: int, city2: int) -> float:
         x1, y1 = self.cities[city1]
         x2, y2 = self.cities[city2]
         
-        if self.edge_weight_type == "EUC_2D":
-            return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-        elif self.edge_weight_type == "ATT":
+        if self.edge_weight_type == "ATT":
             xd = x1 - x2
             yd = y1 - y2
             rij = math.sqrt((xd**2 + yd**2) / 10.0)
             tij = int(round(rij))
-            if tij < rij:
-                return tij + 1
-            else:
-                return tij
+            return tij + 1 if tij < rij else tij
         else:
             return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
@@ -76,14 +72,10 @@ class Chromosome:
             from_city = self.genes[i]
             to_city = self.genes[(i + 1) % len(self.genes)]
             total_distance += self.tsp_data.calculate_distance(from_city, to_city)
-        
         return 1.0 / total_distance if total_distance > 0 else 0
     
     def get_total_distance(self) -> float:
         return 1.0 / self.fitness if self.fitness > 0 else float('inf')
-    
-    def __repr__(self):
-        return f"Chromosome(fitness={self.fitness:.6f}, distance={self.get_total_distance():.2f})"
 
 
 class GeneticAlgorithm:
@@ -102,15 +94,12 @@ class GeneticAlgorithm:
         for _ in range(self.population_size):
             genes = city_ids.copy()
             random.shuffle(genes)
-            chromosome = Chromosome(genes, self.tsp_data)
-            self.population.append(chromosome)
+            self.population.append(Chromosome(genes, self.tsp_data))
         
         self.population.sort(key=lambda x: x.fitness, reverse=True)
         self.best_chromosome = self.population[0]
         self.best_history.append(self.best_chromosome.get_total_distance())
-        
-        print(f"\nİlk Popülasyon Oluşturuldu: {self.population_size} kromozom")
-        print(f"Başlangıç En İyi Mesafe: {self.best_chromosome.get_total_distance():.2f}")
+        print(f"Başlangıç En İyi Mesafe: {self.best_chromosome.get_total_distance():.2f}\n")
     
     def rank_based_selection(self) -> Chromosome:
         sorted_pop = sorted(self.population, key=lambda x: x.fitness)
@@ -118,23 +107,19 @@ class GeneticAlgorithm:
         ranks = list(range(1, n + 1))
         total_rank = sum(ranks)
         probabilities = [rank / total_rank for rank in ranks]
-        selected = random.choices(sorted_pop, weights=probabilities, k=1)[0]
-        return selected
+        return random.choices(sorted_pop, weights=probabilities, k=1)[0]
     
     def roulette_wheel_selection(self) -> Chromosome:
-        total_fitness = sum(chromosome.fitness for chromosome in self.population)
-        
+        total_fitness = sum(c.fitness for c in self.population)
         if total_fitness == 0:
             return random.choice(self.population)
         
         pick = random.uniform(0, total_fitness)
         current = 0
-        
         for chromosome in self.population:
             current += chromosome.fitness
             if current >= pick:
                 return chromosome
-        
         return self.population[-1]
     
     def cycle_crossover(self, parent1: Chromosome, parent2: Chromosome) -> Tuple[Chromosome, Chromosome]:
@@ -164,50 +149,103 @@ class GeneticAlgorithm:
                     child1_genes[idx] = parent2.genes[idx]
                     child2_genes[idx] = parent1.genes[idx]
         
-        for i in range(size):
-            if child1_genes[i] == -1:
-                child1_genes[i] = parent2.genes[i]
-            if child2_genes[i] == -1:
-                child2_genes[i] = parent1.genes[i]
-        
-        child1 = Chromosome(child1_genes, self.tsp_data)
-        child2 = Chromosome(child2_genes, self.tsp_data)
-        
-        return child1, child2
+        return Chromosome(child1_genes, self.tsp_data), Chromosome(child2_genes, self.tsp_data)
     
     def insert_mutation(self, chromosome: Chromosome) -> Chromosome:
         genes = chromosome.genes.copy()
-        size = len(genes)
-        
-        if size < 2:
+        if len(genes) < 2:
             return Chromosome(genes, self.tsp_data)
         
-        remove_idx = random.randint(0, size - 1)
+        remove_idx = random.randint(0, len(genes) - 1)
         gene = genes.pop(remove_idx)
-        insert_idx = random.randint(0, size - 1)
+        insert_idx = random.randint(0, len(genes) - 1)
         genes.insert(insert_idx, gene)
-        
         return Chromosome(genes, self.tsp_data)
     
     def random_slide_mutation(self, chromosome: Chromosome) -> Chromosome:
         genes = chromosome.genes.copy()
-        size = len(genes)
-        
-        if size < 3:
+        if len(genes) < 3:
             return Chromosome(genes, self.tsp_data)
         
-        start = random.randint(0, size - 2)
-        end = random.randint(start + 1, size - 1)
+        start = random.randint(0, len(genes) - 2)
+        end = random.randint(start + 1, len(genes) - 1)
         subset = genes[start:end + 1]
         shift = random.randint(1, len(subset) - 1)
-        subset = subset[shift:] + subset[:shift]
-        genes[start:end + 1] = subset
-        
+        genes[start:end + 1] = subset[shift:] + subset[:shift]
         return Chromosome(genes, self.tsp_data)
+    
+    def two_opt(self, chromosome: Chromosome) -> Chromosome:
+        best_genes = chromosome.genes.copy()
+        best_distance = chromosome.get_total_distance()
+        improved = True
+        
+        while improved:
+            improved = False
+            for i in range(len(best_genes) - 1):
+                for k in range(i + 2, len(best_genes)):
+
+                    new_genes = best_genes.copy()
+                    new_genes[i:k] = reversed(best_genes[i:k])
+                    
+                    new_chromosome = Chromosome(new_genes, self.tsp_data)
+                    new_distance = new_chromosome.get_total_distance()
+                    
+                    if new_distance < best_distance:
+                        best_genes = new_genes
+                        best_distance = new_distance
+                        improved = True
+                        break
+                if improved:
+                    break
+        
+        return Chromosome(best_genes, self.tsp_data)
+    
+    def three_opt(self, chromosome: Chromosome) -> Chromosome:
+        best_genes = chromosome.genes.copy()
+        best_distance = chromosome.get_total_distance()
+        improved = True
+        
+        while improved:
+            improved = False
+            n = len(best_genes)
+            
+            for i in range(n - 2):
+                for j in range(i + 2, n - 1):
+                    for k in range(j + 2, n + (1 if i > 0 else 0)):
+                        
+                        candidates = []
+                        
+                        candidates.append(best_genes[:])
+                        
+                        candidates.append(best_genes[:i] + best_genes[j:k] + best_genes[i:j] + best_genes[k:])
+                        
+                        candidates.append(best_genes[:i] + best_genes[j:k][::-1] + best_genes[i:j] + best_genes[k:])
+                        
+                        candidates.append(best_genes[:i] + best_genes[j:k] + best_genes[i:j][::-1] + best_genes[k:])
+                        
+                        candidates.append(best_genes[:i] + best_genes[i:j][::-1] + best_genes[j:k][::-1] + best_genes[k:])
+                        
+                        for candidate in candidates:
+                            new_chromosome = Chromosome(candidate, self.tsp_data)
+                            new_distance = new_chromosome.get_total_distance()
+                            
+                            if new_distance < best_distance:
+                                best_genes = candidate
+                                best_distance = new_distance
+                                improved = True
+                                break
+                        
+                        if improved:
+                            break
+                    if improved:
+                        break
+                if improved:
+                    break
+        
+        return Chromosome(best_genes, self.tsp_data)
     
     def create_next_generation(self):
         new_population = []
-        
         self.population.sort(key=lambda x: x.fitness, reverse=True)
         new_population.append(copy.deepcopy(self.population[0]))
         
@@ -236,39 +274,84 @@ class GeneticAlgorithm:
         self.generation += 1
         
         self.population.sort(key=lambda x: x.fitness, reverse=True)
-        current_best = self.population[0]
-        
-        if current_best.fitness > self.best_chromosome.fitness:
-            self.best_chromosome = current_best
+        if self.population[0].fitness > self.best_chromosome.fitness:
+            self.best_chromosome = self.population[0]
         
         self.best_history.append(self.best_chromosome.get_total_distance())
     
-    def should_terminate(self, max_generations: int = 100, stagnation_limit: int = 5) -> bool:
+    def should_terminate(self, max_generations: int, stagnation_limit: int) -> bool:
         if self.generation >= max_generations:
-            print(f"\n✓ Sonlandırma: {max_generations} nesil tamamlandı")
+            print(f"\n Sonlandırma: {max_generations} nesil tamamlandı")
             return True
         
         if len(self.best_history) >= stagnation_limit:
             recent_bests = self.best_history[-stagnation_limit:]
             if len(set(recent_bests)) == 1:
-                print(f"\n✓ Sonlandırma: {stagnation_limit} nesil boyunca iyileşme yok")
+                print(f"\n Sonlandırma: {stagnation_limit} nesil boyunca iyileşme yok")
                 return True
-        
         return False
     
-    def run(self, max_generations: int = 100, stagnation_limit: int = 5, verbose: bool = True):
-        
+    def run(self, max_generations: int = 100, stagnation_limit: int = 5, verbose: bool = True, use_local_search: bool = False):
         self.initialize_population()
         
         while not self.should_terminate(max_generations, stagnation_limit):
             self.create_next_generation()
-            
-            if verbose:
+            if verbose and self.generation % 10 == 0:
                 print(f"Nesil {self.generation}: En İyi Mesafe = {self.best_chromosome.get_total_distance():.2f}")
         
-        print(f"Toplam Nesil Sayısı: {self.generation}")
-        print(f"En İyi Çözüm Mesafesi: {self.best_chromosome.get_total_distance():.2f}")
-        print(f"En İyi Tur: {self.best_chromosome.genes[:10]}... (ilk 10 şehir)")
+        if use_local_search:
+            print("\n2-opt optimizasyonu uygulanıyor...")
+            self.best_chromosome = self.two_opt(self.best_chromosome)
+            print(f"2-opt sonrası: {self.best_chromosome.get_total_distance():.2f}")
+            
+            print("3-opt optimizasyonu uygulanıyor...")
+            self.best_chromosome = self.three_opt(self.best_chromosome)
+            print(f"3-opt sonrası: {self.best_chromosome.get_total_distance():.2f}")
+        
+        print(f"\nSonuç: {self.generation} nesil, En İyi Mesafe: {self.best_chromosome.get_total_distance():.2f}")
+        return self.best_chromosome
+
+
+def main():
+    
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    tsp_files = ["berlin52.tsp", "att48.tsp", "a280.tsp", "att532.tsp"]
+    results = []
+    
+    for filename in tsp_files:
+        filepath = os.path.join(current_dir, filename)
+        if not os.path.exists(filepath):
+            continue
+            
+        print("\n" + "="*60)
+        print(f"TSP: {filename}")
         print("="*60)
         
-        return self.best_chromosome
+        tsp_data = TSPData(filepath)
+        ga = GeneticAlgorithm(tsp_data, population_size=100)
+        
+        use_local = tsp_data.dimension <= 100
+        ga.run(max_generations=100, stagnation_limit=5, use_local_search=use_local)
+        
+        improvement = ((ga.best_history[0] - ga.best_chromosome.get_total_distance()) / ga.best_history[0] * 100)
+        results.append({
+            'file': filename,
+            'cities': tsp_data.dimension,
+            'generations': ga.generation,
+            'best': ga.best_chromosome.get_total_distance(),
+            'improvement': improvement,
+            'local_search': 'Evet' if use_local else 'Hayır'
+        })
+    
+    print("\n" + "="*60)
+    print("ÖZET")
+    print("="*60)
+    print(f"{'Dosya':<15} {'Şehir':<8} {'Nesil':<8} {'En İyi':<12} {'İyileşme':<10} {'2/3-opt':<8}")
+    print("-"*70)
+    for r in results:
+        print(f"{r['file']:<15} {r['cities']:<8} {r['generations']:<8} {r['best']:<12.2f} {r['improvement']:<10.2f}% {r['local_search']:<8}")
+    print("="*70 + "\n")
+
+
+if __name__ == "__main__":
+    main()
